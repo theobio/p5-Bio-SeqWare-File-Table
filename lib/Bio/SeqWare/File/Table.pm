@@ -2,7 +2,7 @@ package Bio::SeqWare::File::Table;
 
 use 5.014;
 use strict;
-use warnings FATAL => 'all';
+use warnings;
 
 =head1 NAME
 
@@ -34,6 +34,13 @@ our $VERSION = '0.000001';
 =cut
 
 sub new {
+    my $class = shift;
+    my $fileName = shift;
+    my $self = {
+        'fileName' => $fileName,
+    };
+    bless $self, $class;
+    return $self;
 }
 
 =head1 Object Methods
