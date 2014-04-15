@@ -1,12 +1,16 @@
 package Bio::SeqWare::File::Table;
 
-use 5.014;
+use 5.014;      # Eval error handling unsafe before this.
 use strict;
 use warnings;
+
+use Carp;       # Adds caller-relative error handling.
 
 =head1 NAME
 
 Bio::SeqWare::File::Table - Data representation as a table, including file IO.
+
+=cut
 
 =head1 VERSION
 
@@ -15,7 +19,6 @@ Version 0.000.001
 =cut
 
 our $VERSION = '0.000001';
-
 
 =head1 SYNOPSIS
 
@@ -31,11 +34,20 @@ our $VERSION = '0.000001';
 
 =head2 new()
 
+    my $tableObj = Bio::SeqWare::File::Table->new( $fileName, $paramHR);
+
 =cut
 
 sub new {
     my $class = shift;
     my $fileName = shift;
+
+    if (! defined $fileName) {
+        croak( sprintf( ERR()->{'param.undefined'}, "\$fileName",  "new" ));
+    }
+    if (! -f $fileName) {
+        croak( sprintf( ERR()->{'io.noSuchFile'}, "$fileName" ));
+    }
     my $self = {
         'fileName' => $fileName,
     };
@@ -53,6 +65,41 @@ sub new {
 
 sub getLine {
 
+}
+
+=head1 Internal Methods
+
+=cut
+
+=head2 ERR() {
+
+    Croak( sprintf( ERR()->{'io.noSuchFile'}, $fileName ));
+    Croak( sprintf( ERR()->{'param.undefined'}, $paramName, $subName ));
+
+    Provides error message hash-ref, messages looked up by heirarcichal name.
+    Each message is intended for use as a sprintf string, with 0 or more "%s"
+    place-holders. In all upper case as essentially just a wrapper for a
+    constant set of named strings.
+
+   Goal: Provide fixed-format error messages with variable data without using
+   exception classes.
+
+   Note: Spelling errors and incorrect base strings will not be caught by
+   testing, although incorrect count or content of "%s" values probably will.
+
+=cut
+
+sub ERR {
+   my $err;
+   $err->{'param.undefined'} =
+      "Required paramter \"%s\" is missing or undefined in call to \"%s\".";
+   $err->{'param.empty'} =
+      "Parameter \"%s\" may not be empty in call to \"%s\".";
+   $err->{'io.noSuchFile'} =
+      "No such file (perhaps a permissions issue?): \"%s\".";
+   $err->{'want.ref.hash'} =
+      "Expected %s \"%s\" to be a reference to a hash.";
+   return $err;
 }
 
 =head1 AUTHOR
