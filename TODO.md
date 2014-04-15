@@ -3,20 +3,19 @@
 # ROADMAP
 These changes are planned for the release specified. Date and version indicate when they are expected to be released.
 
-2014-04-14 0.000.002 [API] - Core File IO
-  - Read tab-delimited file with header.
+2014-04-15 0.000.002 [API] - Core File IO
   - Write tab-delimited file with header.
   - Get header unparsed.
   - Get data lines as array-ref, unparsed.
   - Get canonical line-parsed data structure.
 
-2014-04-15 0.000.003 [API] - Data Access
+2014-04-16 0.000.003 [API] - Data Access
   - Get header, parsed as array-ref.
   - Get data lines as array-ref, parsed as array-ref.
   - Get data lines as array-ref, parsed as hash-ref, headers as keys.
   - Get canonical field-parsed data structure.
 
-2014-04-16 0.000.004 [API] - Blanks and Delimiters
+2014-04-17 0.000.004 [API] - Blanks and Delimiters
   - Allow blank lines.
   - Allow headers with embedded spaces.
   - Allow user-specified field delimiter string.
@@ -24,24 +23,24 @@ These changes are planned for the release specified. Date and version indicate w
   - Allow different delimiter in heading and data.
   - Allow blank line delimiter regexp.
 
-2014-04-17 0.000.005 [API] - Comments
+2014-04-18 0.000.005 [API] - Comments
   - Allow ‘#’ specified comments.
   - Get comment lines as array-ref.
   - Allow user-specified comment delimiter string.
   - Allow user-specified comment delimiter regexp.
 
-2014-04-18 0.000.006 [API] - Comment data access
+2014-04-19 0.000.006 [API] - Comment data access
   - Get comment lines as array-ref of blocks.
   - Get comment block associated with header.
   - Get free (unassociated) comments.
   - Get comment block associated with  following data lines.
   - Get data comments as part of data record.
 
-2014-04-19 0.000.007 [API] - Missing headers
+2014-04-20 0.000.007 [API] - Missing headers
   - Allow user header.
   - Allow no header.
 
-2014-04-20 0.000.008 [API] - Uneven rows
+2014-04-21 0.000.008 [API] - Uneven rows
   - Allow uneven data rows if shorter than header.
   - Allow uneven data rows with no header.
   - Allow uneven data rows if longer than header.

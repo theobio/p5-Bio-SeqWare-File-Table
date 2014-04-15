@@ -27,6 +27,10 @@ our $VERSION = '0.000001';
 
     my $tableObj = Bio::SeqWare::File::Table->new( $fileName, $paranHR );
 
+    my $fileName     = $tableObj->getFileName();
+    my $headerLine   = $tableObj->getHeaderLine();
+    my $dataLinesAR  = $tableObj->getDataLines();
+
 =cut
 
 =head1 Class Methods
@@ -35,7 +39,16 @@ our $VERSION = '0.000001';
 
 =head2 new()
 
-    my $tableObj = Bio::SeqWare::File::Table->new( $fileName, $paramHR);
+    my $tableObj = Bio::SeqWare::File::Table->new( $fileName );
+
+Loads data from the specified tab-delimited file. File format must match as
+specified under FILE above.
+
+   PARAM: $fileName
+     Required. The file to read, as a full path or relative to current dir.
+   RETURNS: A Bio::SeqWare::File::Table object containing the data from the
+      specified file.
+   ERRORS: $fileName parameter is required and must be readable.
 
 =cut
 
@@ -104,8 +117,12 @@ sub new {
 =head2 getFileName()
 
     my $fileName = $tableObj->getFileName();
-    
+
 Returns the name of the file as read in. May be a relative file path.
+
+    PARAM: N/A
+    RETURNS: The file path as originally specified.
+    ERRORS: N/A
 
 =cut
 
@@ -119,6 +136,10 @@ sub getFileName {
     my $headerLine = $tableObj->getHeaderLine();
 
 Returns the unparsed header line, without any terminal EOL.
+
+    PARAM: N/A
+    RETURNS: The header line from the file, unparsed.
+    ERRORS: N/A
 
 =cut
 
@@ -134,6 +155,10 @@ sub getHeaderLine {
 
 Returns the unparsed data lines, without any terminal EOL, as an array ref.
 Lines are returned in the original order.
+
+    PARAM: N/A
+    RETURNS: The data lines from the file, as an array-ref, unparsed.
+    ERRORS: N/A
 
 =cut
 
