@@ -5,6 +5,7 @@ use strict;
 use warnings;
 
 use Carp;       # Adds caller-relative error handling.
+use IO::File;   # File handles done better.
 
 =head1 NAME
 
@@ -42,15 +43,56 @@ sub new {
     my $class = shift;
     my $fileName = shift;
 
+    # param $fileName
     if (! defined $fileName) {
         croak( sprintf( ERR()->{'param.undefined'}, "\$fileName",  "new" ));
     }
     if (! -f $fileName) {
         croak( sprintf( ERR()->{'io.noSuchFile'}, "$fileName" ));
     }
+
+    # property 'fileName'
     my $self = {
         'fileName' => $fileName,
     };
+
+    # Get file handle to read from.
+    my $inFH;
+    $! = undef;
+    eval {
+        $inFH = IO::File->new("< $fileName");
+    };
+    my $error = $@;
+    my $ioError = $!;
+    if ($error || ! $inFH) {
+        if ($ioError && $error) {
+           $error .= "\n\t" . $ioError;
+        }
+        if(! $error) {
+            $error = "Unknown error";
+        }
+        croak( sprintf( ERR()->{'io.open.file.read'}, $fileName, $error));
+    }
+
+    # Load data
+    my @rows;
+    my $lineNum = 0;
+    my $isFirstLine = 1;
+    $self->{'index'}->{'DATA'} = [];
+    while ( my $line = <$inFH> ) {
+        chomp $line;
+        push @rows, $line;
+        if ( $isFirstLine ) {
+            $isFirstLine = 0;
+            $self->{'index'}->{'HEADER'} = $lineNum;
+        }
+        else {
+            push @{$self->{'index'}->{'DATA'}}, $lineNum;
+        }
+        ++$lineNum;
+    }
+    $self->{'raw'} = \@rows;
+
     bless $self, $class;
     return $self;
 }
@@ -61,11 +103,47 @@ sub new {
 
 =head2 getFileName()
 
+    my $fileName = $tableObj->getFileName();
+    
+Returns the name of the file as read in. May be a relative file path.
+
 =cut
 
 sub getFileName {
     my $self = shift;
     return $self->{'fileName'};
+}
+
+=head2 getHeaderLine()
+
+    my $headerLine = $tableObj->getHeaderLine();
+
+Returns the unparsed header line, without any terminal EOL.
+
+=cut
+
+sub getHeaderLine {
+    my $self = shift;
+    my $headerPos = $self->{'index'}->{'HEADER'};
+    return $self->{'raw'}->[$headerPos];
+}
+
+=head2 getDataLines()
+
+    my $headerLinesAR = $tableObj->getDataLines();
+
+Returns the unparsed data lines, without any terminal EOL, as an array ref.
+Lines are returned in the original order.
+
+=cut
+
+sub getDataLines {
+    my $self = shift;
+    my @data;
+    for my $dataPos (@{$self->{'index'}->{'DATA'}}) {
+        push @data, $self->{'raw'}->[$dataPos];
+    }
+    return \@data;
 }
 
 =head1 Internal Methods
@@ -100,6 +178,8 @@ sub ERR {
       "Parameter \"%s\" in call to \"%s\" should be of type \"%s\".";
    $err->{'io.noSuchFile'} =
       "No such file (perhaps a permissions issue?): \"%s\".";
+   $err->{'io.open.file.read'} =
+      "Error opening file for reading: \"%s\".\n\t%s";
    return $err;
 }
 
