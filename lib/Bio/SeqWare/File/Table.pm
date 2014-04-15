@@ -59,12 +59,13 @@ sub new {
 
 =cut
 
-=head2 getLine()
+=head2 getFileName()
 
 =cut
 
-sub getLine {
-
+sub getFileName {
+    my $self = shift;
+    return $self->{'fileName'};
 }
 
 =head1 Internal Methods
@@ -92,13 +93,13 @@ sub getLine {
 sub ERR {
    my $err;
    $err->{'param.undefined'} =
-      "Required paramter \"%s\" is missing or undefined in call to \"%s\".";
+      "Paramter \"%s\" in call to \"%s\" is missing or undefined.";
    $err->{'param.empty'} =
-      "Parameter \"%s\" may not be empty in call to \"%s\".";
+      "Parameter \"%s\" in call to \"%s\" is empty.";
+   $err->{'param.bad.type'} =
+      "Parameter \"%s\" in call to \"%s\" should be of type \"%s\".";
    $err->{'io.noSuchFile'} =
       "No such file (perhaps a permissions issue?): \"%s\".";
-   $err->{'want.ref.hash'} =
-      "Expected %s \"%s\" to be a reference to a hash.";
    return $err;
 }
 

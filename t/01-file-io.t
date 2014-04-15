@@ -7,7 +7,7 @@ use Test::More;
 use Bio::SeqWare::File::Table;
 use File::Spec;
 
-plan tests => 2;
+plan tests => 3;
 
 my $CLASS = "Bio::SeqWare::File::Table";
 my $TEST_DATA_DIR = File::Spec->catdir( 't', 'data' );
@@ -29,3 +29,18 @@ my $SIMPLE_TABLE_FILE = File::Spec->catfile( "$TEST_DATA_DIR", "simple.tsv" );
         ok( $obj, $test);
     }
 }
+
+# Object has correct fileName
+{
+    my $obj = $CLASS->new( $SIMPLE_TABLE_FILE );
+    {
+        my $test = "Correct file name can be retrieved.";
+        my $got = $obj->getFileName();
+        my $want = $SIMPLE_TABLE_FILE;
+        is( $got, $want, $test)
+    }
+}
+
+# Object has correct header
+
+# Object has correct data
