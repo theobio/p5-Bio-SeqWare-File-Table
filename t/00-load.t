@@ -10,4 +10,4 @@ BEGIN {
     use_ok( 'Bio::SeqWare::File::Table' ) || print "Bail out!\n";
 }
 
-diag( "Testing Bio::SeqWare::File::Table $Bio::SeqWare::File::Table::VERSION, Perl $], $^X" );
+diag( "Testing Bio::SeqWare::File::Table $Bio::SeqWare::File::Table::VERSION - Perl $] - $^X" );

@@ -37,7 +37,7 @@ our $VERSION = '0.000001';
 
 =cut
 
-=head2 new()
+=head2 new( $fileName )
 
     my $tableObj = Bio::SeqWare::File::Table->new( $fileName );
 
@@ -70,24 +70,27 @@ sub new {
     };
 
     # Get file handle to read from.
+
     my $inFH;
     $! = undef;
     eval {
         $inFH = IO::File->new("< $fileName");
     };
-    my $error = $@;
-    my $ioError = $!;
-    if ($error || ! $inFH) {
-        if ($ioError && $error) {
-           $error .= "\n\t" . $ioError;
+    if ($@) {
+        my $error = $@;
+        if ($! && $error) {
+           $error .= "\n\t" . $!;
         }
-        if(! $error) {
-            $error = "Unknown error";
-        }
+        croak( sprintf( ERR()->{'io.open.file.read'}, $fileName, $error));
+    }
+    # Guard code; probably always have error when no file handle returned
+    if (! $inFH) {
+        my $error = "Unexpected open-for-read failure without IO error.";
         croak( sprintf( ERR()->{'io.open.file.read'}, $fileName, $error));
     }
 
     # Load data
+
     my @rows;
     my $lineNum = 0;
     my $isFirstLine = 1;
@@ -104,6 +107,9 @@ sub new {
         }
         ++$lineNum;
     }
+    # Close file
+    undef $inFH;
+
     $self->{'raw'} = \@rows;
 
     bless $self, $class;
@@ -171,6 +177,74 @@ sub getDataLines {
     return \@data;
 }
 
+=head2 write( $fileName )
+
+    $tableObj->write( $fileName );
+
+Writes out an identical copy of the original file. This is fairly expensive to
+do and requires storing extra information soley for the purpose of outputting
+an exact copy (e.g.. leading and trailing blanks on fields). By default this
+information is NOT preserved, and calling this will generate a warning and
+instead perform a default export( $fileName ). To allow generating an
+actual exact copy, must set the "duplicate" parameter to true when first
+reading the file - see new( $fileName [$paramHR] ).
+
+   PARAM:   $fileName
+     Required. The file to write, as a full path or relative to current dir.
+   RETURNS: N/A
+   ERRORS:  $fileName must be a valid file name and may not already exist.
+            Writing to $fileName must succeed.
+
+=cut
+
+sub write {
+    my $self = shift;
+    my $outFileName = shift;
+
+    # param $fileName
+    if (! defined $outFileName) {
+        croak( sprintf( ERR()->{'param.undefined'}, "\$outFileName",  "write" ));
+    }
+    if (-f $outFileName) {
+        croak( sprintf( ERR()->{'io.open.file.create'}, "$outFileName" ));
+    }
+
+    # Get file handle to write to.
+
+    my $outFH;
+    $! = undef;
+    eval {
+        $outFH = IO::File->new("> $outFileName");
+    };
+    if ($@) {
+        my $error = $@;
+        if ($! && $error) {
+           $error .= "\n\t" . $!;
+        }
+        croak( sprintf( ERR()->{'io.file.write'}, $outFileName, $error));
+    }
+    # Guard code; probably always have error when no file handle returned
+    if (! $outFH) {
+        my $error = "Unexpected open failure without IO error.";
+        croak( sprintf( ERR()->{'io.file.write'}, $outFileName, $error ));
+    }
+
+    # Write out file
+    $! = undef;
+    eval {
+        for my $line (@{$self->{'raw'}}) {
+            print( $outFH $line . "\n");
+        }
+    };
+    if ($@) {
+        my $error = $@;
+        if ($!) {
+            $error .= "\n\t" . $!;
+        }
+        croak( sprintf( ERR()->{'io.file.write'}, $outFileName, $error));
+    };
+    undef $outFH;
+}
 =head1 Internal Methods
 
 =cut
@@ -205,6 +279,10 @@ sub ERR {
       "No such file (perhaps a permissions issue?): \"%s\".";
    $err->{'io.open.file.read'} =
       "Error opening file for reading: \"%s\".\n\t%s";
+   $err->{'io.open.file.create'} =
+      "Error creating file - already exists: \"%s\".";
+   $err->{'io.file.write'} =
+      "Error writing to file: \"%s\".\n\t%s";
    return $err;
 }
 

@@ -6,8 +6,10 @@ use Test::More;
 
 use Bio::SeqWare::File::Table;
 use File::Spec;
+use File::Temp;
+use Test::File::Contents;
 
-plan tests => 5;
+plan tests => 8;
 
 my $CLASS = "Bio::SeqWare::File::Table";
 my $TEST_DATA_DIR = File::Spec->catdir( 't', 'data' );
@@ -66,4 +68,38 @@ my $SIMPLE_TABLE_FILE = File::Spec->catfile( "$TEST_DATA_DIR", "simple.tsv" );
         ];
         is_deeply( $got, $want, $test)
     }
+}
+
+# Write file - identical to original
+{
+     my $obj = $CLASS->new( $SIMPLE_TABLE_FILE );
+     my $dir = File::Temp->newdir();
+     my $fh  = File::Temp->new( DIR => $dir );
+     my $outFileName = $fh->filename();
+
+     # Ensure file does not exist.
+     undef $fh;
+
+     eval {
+         $obj->write( $outFileName );
+     };
+     my $error = $@;
+     {
+        my $test = "No error writing new file from a simple table file.";
+        my $got = $error;
+        my $want = "";
+        is( $got, $want, $test);
+     }
+     {
+        my $test = "Output file exists and is not empty.";
+        ok( -s $SIMPLE_TABLE_FILE > 0, $test);
+     }
+     {
+       my $test = "File written is identical to file read.";
+       files_eq_or_diff( $SIMPLE_TABLE_FILE, $outFileName, $test );
+     }
+
+     # Cleanup dir
+     undef $dir;
+
 }
