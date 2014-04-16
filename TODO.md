@@ -4,10 +4,11 @@
 These changes are planned for the release specified. Date and version indicate when they are expected to be released.
 
 2014-04-15 0.000.002 [API] - Core File IO
-  - Write tab-delimited file with header.
   - Get header unparsed.
   - Get data lines as array-ref, unparsed.
   - Get canonical line-parsed data structure.
+  - Refactor error messages to unify names.
+  - Allow for writing identical and exporting canonical file versions.
 
 2014-04-16 0.000.003 [API] - Data Access
   - Get header, parsed as array-ref.

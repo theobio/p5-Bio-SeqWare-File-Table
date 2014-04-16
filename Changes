@@ -2,6 +2,6 @@ Revision history for p5-Bio-SeqWare-File-Table
 
 0.000.001 2014-04-14
  [MAJOR] - Initial release
-0.000.001 2014-04-15
+0.000.002 2014-04-16
    [API] - Read a tab-delimited file with header.
-
+         - Write tab-delimited file with header.

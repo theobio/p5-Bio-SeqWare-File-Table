@@ -73,20 +73,9 @@ sub new {
 
     my $inFH;
     $! = undef;
-    eval {
-        $inFH = IO::File->new("< $fileName");
-    };
-    if ($@) {
-        my $error = $@;
-        if ($! && $error) {
-           $error .= "\n\t" . $!;
-        }
-        croak( sprintf( ERR()->{'io.open.file.read'}, $fileName, $error));
-    }
-    # Guard code; probably always have error when no file handle returned
+    $inFH = IO::File->new("< $fileName");
     if (! $inFH) {
-        my $error = "Unexpected open-for-read failure without IO error.";
-        croak( sprintf( ERR()->{'io.open.file.read'}, $fileName, $error));
+        croak( sprintf( ERR()->{'io.open.file.read'}, $fileName, $!));
     }
 
     # Load data
@@ -211,38 +200,18 @@ sub write {
 
     # Get file handle to write to.
 
-    my $outFH;
-    $! = undef;
-    eval {
-        $outFH = IO::File->new("> $outFileName");
-    };
-    if ($@) {
-        my $error = $@;
-        if ($! && $error) {
-           $error .= "\n\t" . $!;
-        }
-        croak( sprintf( ERR()->{'io.file.write'}, $outFileName, $error));
-    }
-    # Guard code; probably always have error when no file handle returned
+    my $outFH = IO::File->new("> $outFileName");
     if (! $outFH) {
-        my $error = "Unexpected open failure without IO error.";
-        croak( sprintf( ERR()->{'io.file.write'}, $outFileName, $error ));
+         croak( sprintf( ERR()->{'io.file.write'}, $outFileName, $!));
     }
 
-    # Write out file
-    $! = undef;
-    eval {
-        for my $line (@{$self->{'raw'}}) {
-            print( $outFH $line . "\n");
-        }
-    };
-    if ($@) {
-        my $error = $@;
-        if ($!) {
-            $error .= "\n\t" . $!;
-        }
-        croak( sprintf( ERR()->{'io.file.write'}, $outFileName, $error));
-    };
+    for my $line (@{$self->{'raw'}}) {
+        # Rewritten during coverage testing so error is true branch?
+        # uncoverable branch true
+        print( $outFH $line . "\n")
+            or croak( sprintf( ERR()->{'io.file.write'}, $outFileName, $!)); 
+    }
+
     undef $outFH;
 }
 =head1 Internal Methods
