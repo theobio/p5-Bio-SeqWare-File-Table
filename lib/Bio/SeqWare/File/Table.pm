@@ -177,23 +177,23 @@ sub getDataLines {
     return \@data;
 }
 
-=head2 write( $fileName )
+=head2 write( $outFileName )
 
-    $tableObj->write( $fileName );
+    $tableObj->write( $outFileName );
 
 Writes out an identical copy of the original file. This is fairly expensive to
 do and requires storing extra information soley for the purpose of outputting
 an exact copy (e.g.. leading and trailing blanks on fields). By default this
 information is NOT preserved, and calling this will generate a warning and
-instead perform a default export( $fileName ). To allow generating an
+instead perform a default export( $outFileName ). To allow generating an
 actual exact copy, must set the "duplicate" parameter to true when first
-reading the file - see new( $fileName [$paramHR] ).
+reading the file - see new( $outFileName [$paramHR] ).
 
-   PARAM:   $fileName
+   PARAM:   $outFileName
      Required. The file to write, as a full path or relative to current dir.
    RETURNS: N/A
-   ERRORS:  $fileName must be a valid file name and may not already exist.
-            Writing to $fileName must succeed.
+   ERRORS:  $outFileName must be a valid file name and may not already exist.
+            Writing to $outFileName must succeed.
 
 =cut
 
