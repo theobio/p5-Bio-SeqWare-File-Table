@@ -6,6 +6,7 @@ use Test::More;
 
 use Bio::SeqWare::File::Table;
 use File::Spec;
+use Test::MockObject;   # Fake objects for testing errors
 
 plan tests => 3;
 
