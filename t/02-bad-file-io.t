@@ -11,19 +11,25 @@ use Carp;
 use IO::File;           # Only for getting a valid $! value.
 use Test::MockModule;   # Fake methods for "used" package modules.
 
-plan tests => 8;
+plan tests => 10;
 
 my $CLASS = "Bio::SeqWare::File::Table";
 my $TEST_DATA_DIR = File::Spec->catdir( 't', 'data' );
 my $SIMPLE_TABLE_FILE = File::Spec->catfile( "$TEST_DATA_DIR", "simple.tsv" );
 my $ERR = ${CLASS}->ERR();
 
-# Set up missing filename.
+# Set up bad filenames.
 my $MISSING_FILENAME = "n0SUchfil3Nam3Ih0pe";
 {
     my $test = 'Ensure bad filename is really bad';
     my $found = (-f $MISSING_FILENAME);
     ok( ! $found, $test);
+}
+my $EMPTY_TABLE_FILE = File::Spec->catfile( "$TEST_DATA_DIR", "BAD_empty.tsv" );
+{
+    my $test = 'Ensure empty filename is really empty';
+    my $isEmpty = -s $EMPTY_TABLE_FILE == 0;
+    ok( $isEmpty, $test);
 }
 
 # Set up $! value for use in file open error testing.
@@ -39,6 +45,7 @@ my $IO_ERROR = $!;
 }
 
 # Check errors generated on bad filename when loading file.
+# (Essentially this is checking getInFH)
 {
     # No parameters
     {
@@ -50,7 +57,7 @@ my $IO_ERROR = $!;
         {
             my $test = 'Missing $filename error without parameters?';
             my $got = $error;
-            my $want = sprintf( $ERR->{'param.undefined'}, "\$fileName", "new",  );
+            my $want = sprintf( $ERR->{'param.undefined'}, "\$fileName", "Bio::SeqWare::File::Table::new",  );
             like( $got, qr/^\Q$want\E/m, $test);
         }
     }
@@ -95,6 +102,7 @@ my $IO_ERROR = $!;
 }
 
 # Check errors generated on bad filename when writing file.
+# (Essentially this is checking getOutFH)
 {
     # No parameters
     {
@@ -106,7 +114,7 @@ my $IO_ERROR = $!;
         {
             my $test = 'Missing $filename error without parameters?';
             my $got = $error;
-            my $want = sprintf( $ERR->{'param.undefined'}, "\$outFileName", "write",  );
+            my $want = sprintf( $ERR->{'param.undefined'}, "\$fileName", "Bio::SeqWare::File::Table::write",  );
             like( $got, qr/^\Q$want\E/, $test);
         }
     }
@@ -148,4 +156,20 @@ my $IO_ERROR = $!;
         my $want = sprintf( $ERR->{'io.file.write'}, "$MISSING_FILENAME", $IO_ERROR );
         like( $got, qr/^\Q$want\E/, $test);
     }
+}
+
+# Handle empty file
+{
+    my $obj;
+    eval {
+        $obj = $CLASS->new($EMPTY_TABLE_FILE);
+    };
+    my $error = $@;
+    {
+        my $test = 'Error if input file is empty?';
+        my $got = $error;
+        my $want = sprintf( $ERR->{'in.file.empty'}, "$EMPTY_TABLE_FILE" );
+        like( $got, qr/^\Q$want\E/m, $test);
+    }
+
 }

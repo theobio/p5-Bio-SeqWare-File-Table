@@ -2,9 +2,18 @@ Revision history for p5-Bio-SeqWare-File-Table
 
 0.000.001 2014-04-14
  [MAJOR] - Initial release
-0.000.002 2014-04-16
-   [API] - Read a tab-delimited file with header.
-         - Write tab-delimited file with header.
-         - Get header unparsed.
-         - Get data lines as array-ref, unparsed.
-         - Get canonical line-parsed data structure.
+0.000.002 2014-04-17
+   [API] - Read a tab-delimited file with header (new).
+         - Write tab-delimited file with header (write).
+         - Get header unparsed (getHeaderLine).
+         - Get data lines as array-ref, unparsed (getDataLines).
+         - Get canonical line-parsed data structure (getRawData).
+         - Allow for writing identical and canonical files (export).
+   [BUG] - Handle missing EOL on last line of file.
+   [BUG] - Handle empty input file.
+   [BUG] - Handle no-data (header only) input file.
+   [BUG] - Fix '$!' line in tests.
+   [DEV] - Refactor to simplify error checking (ERR).
+   [DEV] - Refactor to reduce code duplication (write, export, getInFH,
+              getOutFH).
+   [DEV] - Refactor tests to improve test coverage (Mock::Module of IO::File).

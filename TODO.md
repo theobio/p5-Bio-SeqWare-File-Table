@@ -3,9 +3,8 @@
 # ROADMAP
 These changes are planned for the release specified. Date and version indicate when they are expected to be released.
 
-2014-04-15 0.000.002 [API] - Core File IO
-  - Allow for writing identical and exporting canonical file versions.
-  - Bad input file handling
+2014-04-15 0.000.002 - Core File IO
+   [DEV] - Refactor tests to have one test file per trial input file.
 
 2014-04-16 0.000.003 [API] - Data Access
   - Get header, parsed as array-ref.

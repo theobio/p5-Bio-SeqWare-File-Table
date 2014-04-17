@@ -56,27 +56,11 @@ sub new {
     my $class = shift;
     my $fileName = shift;
 
-    # param $fileName
-    if (! defined $fileName) {
-        croak( sprintf( ERR()->{'param.undefined'}, "\$fileName",  "new" ));
-    }
-    if (! -f $fileName) {
-        croak( sprintf( ERR()->{'io.noSuchFile'}, "$fileName" ));
-    }
+    my $self = {};
+    $self = bless $self, $class;
 
-    # property 'fileName'
-    my $self = {
-        'fileName' => $fileName,
-    };
-
-    # Get file handle to read from.
-
-    my $inFH;
-    $! = undef;
-    $inFH = IO::File->new("< $fileName");
-    if (! $inFH) {
-        croak( sprintf( ERR()->{'io.open.file.read'}, $fileName, $!));
-    }
+    my $inFH = $self->getInFH( $fileName );
+    $self->{'fileName'} = $fileName;
 
     # Load data
 
@@ -98,8 +82,12 @@ sub new {
         }
         ++$lineNum;
     }
+    if ($isFirstLine) {
+        croak( sprintf( ERR()->{'in.file.empty'}, $fileName ));
+    }
+
     # Close file
-    undef $inFH;
+    $inFH->close();
 
     $self->{'raw'} = \@rows;
     $self->{'terminalEOL'} = 0;
@@ -107,7 +95,6 @@ sub new {
         $self->{'terminalEOL'} = 1;
     }
 
-    bless $self, $class;
     return $self;
 }
 
@@ -165,7 +152,7 @@ Lines are returned in the original order.
 
 sub getDataLines {
     my $self = shift;
-    my @data;
+    my @data = ();
     for my $dataPos (@{$self->{'index'}->{'DATA'}}) {
         push @data, $self->{'raw'}->[$dataPos];
     }
@@ -237,22 +224,10 @@ reading the file - see new( $outFileName [$paramHR] ).
 
 sub write {
     my $self = shift;
-    my $outFileName = shift;
+    my $fileName = shift;
 
-    # param $fileName
-    if (! defined $outFileName) {
-        croak( sprintf( ERR()->{'param.undefined'}, "\$outFileName",  "write" ));
-    }
-    if (-f $outFileName) {
-        croak( sprintf( ERR()->{'io.open.file.create'}, "$outFileName" ));
-    }
-
-    # Get file handle to write to.
-
-    my $outFH = IO::File->new("> $outFileName");
-    if (! $outFH) {
-         croak( sprintf( ERR()->{'io.file.write'}, $outFileName, $!));
-    }
+    # Checks $outFileName parameters.
+    my $outFH = $self->getOutFH( $fileName );
 
     for ( my $pos = 0; $pos < scalar( @{$self->{'raw'}}) - 1; ++$pos) {
 
@@ -262,7 +237,7 @@ sub write {
         #
         # uncoverable branch true
         print( $outFH $self->{'raw'}->[$pos] . "\n")
-            or croak( sprintf( ERR()->{'io.file.write'}, $outFileName, $!)); 
+            or croak( sprintf( ERR()->{'io.file.write'}, $fileName, $!)); 
     }
     my $lastEOL = "";
     if ($self->{'terminalEOL'}) {
@@ -270,9 +245,9 @@ sub write {
     }
     # uncoverable branch true
     print( $outFH $self->{'raw'}->[-1] . $lastEOL)
-        or croak( sprintf( ERR()->{'io.file.write'}, $outFileName, $!)); 
+        or croak( sprintf( ERR()->{'io.file.write'}, $fileName, $!)); 
 
-    undef $outFH;
+    $outFH->close();
 }
 
 =head2 export( $outFileName )
@@ -293,23 +268,9 @@ That means: Adding a terminal EOL if none.
 sub export{
 
     my $self = shift;
-    my $outFileName = shift;
+    my $fileName = shift;
 
-    # param $fileName
-    if (! defined $outFileName) {
-        croak( sprintf( ERR()->{'param.undefined'}, "\$outFileName",  "write" ));
-    }
-    if (-f $outFileName) {
-        croak( sprintf( ERR()->{'io.open.file.create'}, "$outFileName" ));
-    }
-
-    # Get file handle to write to.
-
-    my $outFH = IO::File->new("> $outFileName");
-
-    if (! $outFH) {
-         croak( sprintf( ERR()->{'io.file.write'}, $outFileName, $!));
-    }
+    my $outFH = $self->getOutFH( $fileName );
 
     # Stupid hard to mock print return values, so tagging to skips coverage
     # testing. Note: This code is rewritten during coverage testing so
@@ -317,19 +278,105 @@ sub export{
     #
     # uncoverable branch true
     print( $outFH $self->{'raw'}->[$self->{'index'}->{'HEADER'}] . "\n")
-        or croak( sprintf( ERR()->{'io.file.write'}, $outFileName, $!)); 
+        or croak( sprintf( ERR()->{'io.file.write'}, $fileName, $!));
 
     for my $pos (@{$self->{'index'}->{'DATA'}}) {
         # uncoverable branch true
         print( $outFH $self->{'raw'}->[$pos] . "\n")
-            or croak( sprintf( ERR()->{'io.file.write'}, $outFileName, $!)); 
+            or croak( sprintf( ERR()->{'io.file.write'}, $fileName, $!)); 
     }
-    undef $outFH;
+    $outFH->close();
 }
 
 =head1 Internal Methods
 
 =cut
+
+=head2 getInFH( $fileName )
+
+    my $inFH = $tableObj->getInFH( $fileName );
+    #...
+    $inFH->close();
+      # or
+    undef $inFH;
+
+This checks to see if $fileName can be used as a file name and that it exists.
+Then it returns the $inFH for use in reading from this file. The handle will
+automatically be closed when it goes out of scope (including being explicitly
+undefined.)
+
+    PARAM: $fileName - The file to create for writting to (relative path ok.)
+    RETURNS: A file handle open for writting.
+    ERRORS: The $outFileName must be a valid file name and may not pre-exist.
+
+=cut
+
+sub getInFH {
+
+    my $self = shift;
+    my $fileName = shift;
+
+    # param $fileName
+    if (! defined $fileName) {
+        croak( sprintf( ERR()->{'param.undefined'}, "\$fileName",  (caller(1))[3] ));
+    }
+    if (! -f $fileName) {
+        croak( sprintf( ERR()->{'io.noSuchFile'}, "$fileName" ));
+    }
+    # Get file handle to read from.
+
+    my $inFH;
+    $! = undef;
+    $inFH = IO::File->new("< $fileName");
+    if (! $inFH) {
+        croak( sprintf( ERR()->{'io.open.file.read'}, $fileName, $!));
+    }
+
+    return $inFH;
+}
+
+
+=head2 getOutFH( $fileName )
+
+    my $outFH = $tableObj->getOutFH( $fileName );
+    #...
+    $inFH->close();
+      # or
+    undef $inFH;
+
+This checks to see if $fileName can be used as a file name and that it does
+not exist. Then it returns the $outFH for use. The handle will automatically be
+closed when it goes out of scope (including being explicitly undefined.)
+
+    PARAM: $fileName - The file to create for writting to (relative path ok.)
+    RETURNS: A file handle open for writting.
+    ERRORS: The $outFileName must be a valid file name and may not pre-exist.
+
+=cut
+
+sub getOutFH {
+
+    my $self = shift;
+    my $fileName = shift;
+
+    # param $fileName
+    if (! defined $fileName) {
+        croak( sprintf( ERR()->{'param.undefined'}, "\$fileName",  (caller(1))[3] ));
+    }
+    if (-f $fileName) {
+        croak( sprintf( ERR()->{'io.open.file.create'}, "$fileName" ));
+    }
+
+    # Get file handle to write to.
+
+    my $outFH = IO::File->new("> $fileName");
+
+    if (! $outFH) {
+         croak( sprintf( ERR()->{'io.file.write'}, $fileName, $!));
+    }
+
+    return $outFH;
+}
 
 =head2 ERR() {
 
@@ -352,7 +399,7 @@ sub export{
 sub ERR {
    my $err;
    $err->{'param.undefined'} =
-      "Paramter \"%s\" in call to \"%s\" is missing or undefined.";
+      "Parameter \"%s\" in call to \"%s\" is missing or undefined.";
    $err->{'param.empty'} =
       "Parameter \"%s\" in call to \"%s\" is empty.";
    $err->{'param.bad.type'} =
@@ -365,6 +412,8 @@ sub ERR {
       "Error creating file - already exists: \"%s\".";
    $err->{'io.file.write'} =
       "Error writing to file: \"%s\".\n\t%s";
+   $err->{'in.file.empty'} =
+      "Error reading input file, file is empty: \"%s\".";
    return $err;
 }
 
