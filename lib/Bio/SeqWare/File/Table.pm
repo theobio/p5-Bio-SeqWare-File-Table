@@ -3,7 +3,7 @@ package Bio::SeqWare::File::Table;
 use 5.014;      # Eval error handling unsafe before this.
 use strict;
 use warnings;
-
+use Data::Dumper;
 use Carp;       # Adds caller-relative error handling.
 use IO::File;   # File handles done better.
 
@@ -84,7 +84,9 @@ sub new {
     my $lineNum = 0;
     my $isFirstLine = 1;
     $self->{'index'}->{'DATA'} = [];
+    my $lastLine;
     while ( my $line = <$inFH> ) {
+        $lastLine = $line;
         chomp $line;
         push @rows, $line;
         if ( $isFirstLine ) {
@@ -100,6 +102,10 @@ sub new {
     undef $inFH;
 
     $self->{'raw'} = \@rows;
+    $self->{'terminalEOL'} = 0;
+    if ( substr( $lastLine, -1 ) eq "\n") {
+        $self->{'terminalEOL'} = 1;
+    }
 
     bless $self, $class;
     return $self;
@@ -166,6 +172,49 @@ sub getDataLines {
     return \@data;
 }
 
+=head2 getRawData()
+
+    my $dataHR = $tableObj->getRawData();
+
+Returns a data structure that contains all the original rows and how they
+were classified, including enough data to identically reproduce the original
+file.
+
+    PARAM: N/A
+    RETURNS: Hash-ref. The record of the data as read in.
+      $ret->{'fileName'} = The name of the file read in.
+      $ret->{'terminalEOL} = True if original file has a terminal EOL on the
+          last line.
+      $ret->{'lines'} = Array-ref. The original data lines, without EOL.
+      $ret->{'lines'}->[#] = The row from line # of the file read. From 0.
+      $ret->{'structure'} = Array-ref. What type each data line is.
+      $ret->{'structure'}->[#] = The structure of row #. Will be one of:
+          'HEADER' or 'DATA'
+      $ret->{'index'}->{'HEADER'} = The row containing the header.
+      $ret->{'index'}->{'DATA'} = Array-ref. The row numbers that contain data.
+      $ret->{'index'}->{'DATA'}->[#] = The #'th data row.
+    ERRORS: N/A
+
+=cut
+
+sub getRawData() {
+    my $self = shift;
+    my $backHR;
+    $backHR->{'fileName'} = $self->{'fileName'};
+    $backHR->{'terminalEOL'} = $self->{'terminalEOL'};
+    $backHR->{'lines'} = \@{$self->{'raw'}};
+    $backHR->{'index'}->{'header'} = $self->{'index'}->{'HEADER'};
+    $backHR->{'index'}->{'data'} = \@{$self->{'index'}->{'DATA'}};
+    my $structureAR;
+    $structureAR->[$self->{'index'}->{'HEADER'}] = 'HEADER';
+    for my $dataPos (@{$self->{'index'}->{'DATA'}}) {
+        $structureAR->[$dataPos] = 'DATA';
+    }
+    $backHR->{'structure'} = $structureAR;
+
+    return $backHR;
+}
+
 =head2 write( $outFileName )
 
     $tableObj->write( $outFileName );
@@ -205,15 +254,79 @@ sub write {
          croak( sprintf( ERR()->{'io.file.write'}, $outFileName, $!));
     }
 
-    for my $line (@{$self->{'raw'}}) {
-        # Rewritten during coverage testing so error is true branch?
+    for ( my $pos = 0; $pos < scalar( @{$self->{'raw'}}) - 1; ++$pos) {
+
+        # Stupid hard to mock print return values, so tagging to skip coverage
+        # testing. Note: This code is rewritten during coverage testing so
+        # error is the true branch.
+        #
         # uncoverable branch true
-        print( $outFH $line . "\n")
+        print( $outFH $self->{'raw'}->[$pos] . "\n")
             or croak( sprintf( ERR()->{'io.file.write'}, $outFileName, $!)); 
     }
+    my $lastEOL = "";
+    if ($self->{'terminalEOL'}) {
+        $lastEOL = "\n";
+    }
+    # uncoverable branch true
+    print( $outFH $self->{'raw'}->[-1] . $lastEOL)
+        or croak( sprintf( ERR()->{'io.file.write'}, $outFileName, $!)); 
 
     undef $outFH;
 }
+
+=head2 export( $outFileName )
+
+    $tableObj->export( $fileName );
+
+Write a copy of the file as the specified $outFileName, in canonical format.
+
+That means: Adding a terminal EOL if none.
+
+    PARAM:   N/A
+    RETURNS: N/A
+    ERRORS:  The $outFileName must be a valid file name and may not pre-exist.
+       Writing the file must succeed.
+
+=cut
+
+sub export{
+
+    my $self = shift;
+    my $outFileName = shift;
+
+    # param $fileName
+    if (! defined $outFileName) {
+        croak( sprintf( ERR()->{'param.undefined'}, "\$outFileName",  "write" ));
+    }
+    if (-f $outFileName) {
+        croak( sprintf( ERR()->{'io.open.file.create'}, "$outFileName" ));
+    }
+
+    # Get file handle to write to.
+
+    my $outFH = IO::File->new("> $outFileName");
+
+    if (! $outFH) {
+         croak( sprintf( ERR()->{'io.file.write'}, $outFileName, $!));
+    }
+
+    # Stupid hard to mock print return values, so tagging to skips coverage
+    # testing. Note: This code is rewritten during coverage testing so
+    # error is the true branch.
+    #
+    # uncoverable branch true
+    print( $outFH $self->{'raw'}->[$self->{'index'}->{'HEADER'}] . "\n")
+        or croak( sprintf( ERR()->{'io.file.write'}, $outFileName, $!)); 
+
+    for my $pos (@{$self->{'index'}->{'DATA'}}) {
+        # uncoverable branch true
+        print( $outFH $self->{'raw'}->[$pos] . "\n")
+            or croak( sprintf( ERR()->{'io.file.write'}, $outFileName, $!)); 
+    }
+    undef $outFH;
+}
+
 =head1 Internal Methods
 
 =cut

@@ -4,17 +4,15 @@
 These changes are planned for the release specified. Date and version indicate when they are expected to be released.
 
 2014-04-15 0.000.002 [API] - Core File IO
-  - Get header unparsed.
-  - Get data lines as array-ref, unparsed.
-  - Get canonical line-parsed data structure.
-  - Refactor error messages to unify names.
   - Allow for writing identical and exporting canonical file versions.
+  - Bad input file handling
 
 2014-04-16 0.000.003 [API] - Data Access
   - Get header, parsed as array-ref.
   - Get data lines as array-ref, parsed as array-ref.
   - Get data lines as array-ref, parsed as hash-ref, headers as keys.
   - Get canonical field-parsed data structure.
+  - Identical with/without EOL on last line.
 
 2014-04-17 0.000.004 [API] - Blanks and Delimiters
   - Allow blank lines.
@@ -23,6 +21,7 @@ These changes are planned for the release specified. Date and version indicate w
   - Allow user-specified field delimiter regexp.
   - Allow different delimiter in heading and data.
   - Allow blank line delimiter regexp.
+  - Allow other EOL
 
 2014-04-18 0.000.005 [API] - Comments
   - Allow ‘#’ specified comments.
