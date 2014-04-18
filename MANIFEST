@@ -5,7 +5,17 @@ lib/Bio/SeqWare/File/Table.pm
 MANIFEST			This list of files
 README.md
 t/00-load.t
+t/01-simple-file-io.t
+t/02-bad-parameters.t
+t/03-bad-file-handles.t
+t/04-altEOL-file-io.t
+t/05-noData-file-io.t
+t/06-BAD_empty-file-io.t
 t/manifest.t
 t/pod-coverage.t
 t/pod.t
+t/data/altEOL.tsv
+t/data/BAD_empty.tsv
+t/data/noData.tsv
+t/data/simple.tsv
 TODO.md

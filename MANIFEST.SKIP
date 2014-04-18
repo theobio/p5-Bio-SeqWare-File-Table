@@ -13,6 +13,15 @@
 # Avoid archives of this distribution
 \bBio-SeqWare-File-Table-[\d\.\_]+
 
+# Test coverage stuff
+cover_db*
+
 # Eclipse IDE
 .project
 .includepath
+
+# Git files
+.git*
+
+# Mac OS X
+.DS_Store
