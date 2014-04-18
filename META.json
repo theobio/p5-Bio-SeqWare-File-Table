@@ -1,0 +1,47 @@
+{
+   "abstract" : "Data representation as a table, including file IO.",
+   "author" : [
+      "Stuart R. Jefferys <srjefferys (at) gmail (dot) com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Bio-SeqWare-File-Table",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::MockModule" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.014"
+         }
+      }
+   },
+   "provides" : {
+      "Bio::SeqWare::File::Table" : {
+         "file" : "lib/Bio/SeqWare/File/Table.pm",
+         "version" : "0.000002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/gpl-license.php"
+      ]
+   },
+   "version" : "0.000002"
+}
