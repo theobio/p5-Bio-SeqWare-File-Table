@@ -15,8 +15,7 @@ pod2htm*.tmp
 pm_to_blib
 
 # Perl: this repo
-p5-Bio-SeqWare-Uploads-File-Table-*
-p5-Bio-SeqWare-Uploads-File-Table-*.tar.gz
+Bio-SeqWare-File-Table-*.tar.gz
 
 # OS: Mac OS X
 .DS_Store

@@ -19,3 +19,6 @@ t/data/BAD_empty.tsv
 t/data/noData.tsv
 t/data/simple.tsv
 TODO.md
+Makefile.PL
+META.yml
+META.json
