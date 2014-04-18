@@ -15,11 +15,11 @@ Bio::SeqWare::File::Table - Data representation as a table, including file IO.
 
 =head1 VERSION
 
-Version 0.000.001
+Version 0.000.002
 
 =cut
 
-our $VERSION = '0.000001';
+our $VERSION = '0.000002';
 
 =head1 SYNOPSIS
 
@@ -423,47 +423,59 @@ Stuart R. Jefferys, C<< <srjefferys (at) gmail (dot) com> >>
 
 =cut
 
-=head1 BUGS
+=head1 CONTRIBUTING
 
-Please report any bugs or feature requests to C<bug-p5-bio-seqware-file-table at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=p5-Bio-SeqWare-File-Table>.  I will be notified, and then you'll
-automatically be notified of progress on your bug as I make changes.
+This module is developed and hosted on GitHub, at
+L<p5-Bio-SeqWare-File-Table | 
+https://github.com/theobio/p5-Bio-SeqWare-File-Table>. It
+is not currently on CPAN, and I don't have any immediate plans to post it
+there unless requested by core SeqWare developers (It is not my place to
+set out a module name hierarchy for the project as a whole :)
+
+=cut
+
+=head1 INSTALLATION
+
+You can install a version of this module directly from github using
+
+   $ cpanm git://github.com/theobio/p5-Bio-SeqWare-File-Table.git@v0.000.002
+ or
+   $ cpanm https://github.com/theobio/p5-Bio-SeqWare-File-Table/archive/v0.000.002.tar.gz
+
+Any version can be specified by modifying the tag name, following the @;
+the above installs the latest I<released> version. If you leave off the @version
+part of the link, you can install the bleading edge pre-release, if you don't
+care about bugs...
+
+You can select and download any package for any released version of this module
+directly from L<https://github.com/theobio/p5-Bio-SeqWare-File-Table/releases>.
+Installing is then a matter of unzipping it, changing into the unzipped
+directory, and then executing the normal (C>Module::Build>) incantation:
+
+     perl Build.PL
+     ./Build
+     ./Build test
+     ./Build install
 
 =cut
 
+=head1 BUGS AND SUPPORT
 
-=head1 SUPPORT
+No known bugs are present in this release. Unknown bugs are a virtual
+certainty. Please report bugs (and feature requests) though the
+Github issue tracker associated with the development repository, at:
 
-You can find documentation for this module with the perldoc command.
+L<https://github.com/theobio/p5-Bio-SeqWare-File-Table/issues>
 
-    perldoc Bio::SeqWare::File::Table
-
-
-You can also look for information at:
-
-=over 4
-
-=item * RT: CPAN's request tracker (report bugs here)
-
-L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=p5-Bio-SeqWare-File-Table>
-
-=item * AnnoCPAN: Annotated CPAN documentation
-
-L<http://annocpan.org/dist/p5-Bio-SeqWare-File-Table>
-
-=item * CPAN Ratings
-
-L<http://cpanratings.perl.org/d/p5-Bio-SeqWare-File-Table>
-
-=item * Search CPAN
-
-L<http://search.cpan.org/dist/p5-Bio-SeqWare-File-Table/>
-
-=back
+Note: you must have a GitHub account to submit issues.
 
 =cut
+
 
 =head1 ACKNOWLEDGEMENTS
+
+This module was developed for use with L<SegWare | http://seqware.github.io>
+at the University of North Carolina - Chapel Hill.
 
 =cut
 
