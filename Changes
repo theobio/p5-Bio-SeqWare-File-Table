@@ -17,3 +17,4 @@ Revision history for p5-Bio-SeqWare-File-Table
    [DEV] - Refactor to reduce code duplication (write, export, getInFH,
               getOutFH).
    [DEV] - Refactor tests to improve test coverage (Mock::Module of IO::File).
+   [DEV] - Refactor tests to have one test file per trial input file.
