@@ -3,7 +3,6 @@ package Bio::SeqWare::File::Table;
 use 5.014;      # Eval error handling unsafe before this.
 use strict;
 use warnings;
-use Data::Dumper;
 use Carp;       # Adds caller-relative error handling.
 use IO::File;   # File handles done better.
 

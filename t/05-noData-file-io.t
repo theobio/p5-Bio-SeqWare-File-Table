@@ -8,7 +8,6 @@ use Bio::SeqWare::File::Table;
 use File::Spec;
 use File::Temp;
 use Test::File::Contents;
-use Data::Dumper;
 
 plan tests => 13;
 

@@ -3,13 +3,10 @@ use 5.014;
 use strict;
 use warnings;
 use Test::More;
-use Data::Dumper;
 
 use Bio::SeqWare::File::Table;
 use File::Spec;
 use Carp;
-use IO::File;           # Only for getting a valid $! value.
-use Test::MockModule;   # Fake methods for "used" package modules.
 
 plan tests => 2;
 
